@@ -30,7 +30,7 @@ public class RepoService {
                 .limit(pageable.getPageSize())
                 .collect(Collectors.toList());
 
-        return new PageImpl<MazeInfo>(listForPage,  pageable, listMazeInfo.size());
+        return new PageImpl<>(listForPage, pageable, listMazeInfo.size());
         /*
         pageable.first()
         pageable.getOffset() , pageable.getPageNumber(), pageable.getPageSize()
@@ -49,8 +49,8 @@ public class RepoService {
 
         return MazeInfo.builder()
                 .createDate(faker.date().birthday())
-                .fileName(faker.file().fileName())
                 .uuid(UUID.randomUUID())
+                .fileName(faker.file().fileName())
                 .build();
     }
 }

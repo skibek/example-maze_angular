@@ -4,15 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.maze.domain.MazeInfo;
 import org.example.maze.model.Maze;
+import org.example.maze.model.MazeSolutionMode;
 import org.example.maze.model.MazeSolverEnum;
-import org.example.maze.service.tools.MazeTools;
 import org.example.maze.web.rest.vm.InFileVM;
 import org.example.maze.web.rest.vm.OutMazeFileVM;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -20,35 +23,39 @@ import java.util.UUID;
 @Service
 public class FileService {
 
-    private final RepoService repoService;
     private final MazeSolverService mazeSolverService;
-    private final MazeTools mazeTools;
 
-    public OutMazeFileVM consumeMazeFile(InFileVM fileMetadata, MultipartFile multipartFile) throws IOException {
+    public OutMazeFileVM consumeMazeFile(InFileVM inFileMetadata, MultipartFile multipartFile) throws IOException {
         String mazeBody = new String(multipartFile.getBytes());
-
-        MazeInfo mazeInfo = MazeInfo.builder()
-                .createDate(new Date())
-                .fileName(fileMetadata.getFileName())
-                .uuid(UUID.randomUUID())
-                .build();
-
-        //todo go to calc and add info
-        Maze maze = mazeTools.initializeMaze(mazeBody);
-        log.info(maze.toString());
-        log.info(maze.displayGraphics());
-        mazeSolverService.solveMaze(MazeSolverEnum.Breadth_First_Search, maze);
-
-        repoService.add(mazeInfo);
-
-        return OutMazeFileVM.builder()
-                .fileName(fileMetadata.getFileName())
-                .mazeInfo(mazeInfo)
-                .uuid(UUID.randomUUID())
-                .build();
+        return processMaze(mazeBody, inFileMetadata);
     }
 
-    public void readLocalFile(String path) {
+    public OutMazeFileVM readLocalFile(File fileWithMaze) throws FileNotFoundException {
+        StringBuilder fileText = new StringBuilder();
+        try (Scanner input = new Scanner(fileWithMaze)) {
+            while (input.hasNextLine()) {
+                fileText.append(input.nextLine()).append("\n");
+            }
+        }
+        return processMaze(fileText.toString(),
+                InFileVM.builder()
+                        .mode(MazeSolutionMode.ALL_SOLUTIONS)
+                        .fileName("test.only")
+                        .build());
+    }
 
+    private OutMazeFileVM processMaze(String mazeBody, InFileVM inFileMetadata) {
+        MazeInfo mazeInfo = mazeSolverService.solveMazeAndSave(MazeSolverEnum.Breadth_First_Search, mazeBody, inFileMetadata.getMode());
+        mazeInfo.setCreateDate(new Date());
+        mazeInfo.setMazeInString(mazeBody);
+        mazeInfo.setFileName(inFileMetadata.getFileName());
+        UUID uuid = UUID.randomUUID();
+        mazeInfo.setUuid(uuid);
+
+        return OutMazeFileVM.builder()
+                .fileName(inFileMetadata.getFileName())
+                .mazeInfo(mazeInfo)
+                .uuid(uuid)
+                .build();
     }
 }

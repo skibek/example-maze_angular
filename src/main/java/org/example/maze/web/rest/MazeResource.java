@@ -22,6 +22,7 @@ import java.net.URISyntaxException;
 
 @Slf4j
 @RequiredArgsConstructor
+@CrossOrigin(maxAge = 3600)
 @RestController
 @RequestMapping(MazeResource.ENTITIES_URI)
 public class MazeResource {
@@ -32,10 +33,10 @@ public class MazeResource {
     private final RepoService repoService;
 
     @PostMapping
-    public ResponseEntity<OutMazeFileVM> uploadMazeFile(@RequestParam(value = "metadata") String metadata,
+    public ResponseEntity<OutMazeFileVM> uploadMazeFile(@RequestParam(value = "inFileVM") String inFileVM,
                                                         @RequestPart(value = "file") MultipartFile multipartFile)
             throws URISyntaxException, IOException {
-        return processFile(metadata, multipartFile);
+        return processFile(inFileVM, multipartFile);
     }
 
     @GetMapping

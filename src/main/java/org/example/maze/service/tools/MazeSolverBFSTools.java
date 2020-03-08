@@ -2,6 +2,7 @@ package org.example.maze.service.tools;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.maze.domain.MazeInfo;
+import org.example.maze.domain.MazeInfoPath;
 import org.example.maze.model.DirectionEnum;
 import org.example.maze.model.Maze;
 import org.example.maze.model.MazeStructureEnum;
@@ -18,6 +19,7 @@ public class MazeSolverBFSTools {
 
     public MazeInfo solve_BreadthFirst(Maze maze) {
         MazeInfo mazeInfo = new MazeInfo();
+        mazeInfo.setMaze(maze);
         LinkedList<Point> nextToVisit = new LinkedList<>();
         Point start = maze.getIn();
         nextToVisit.add(start);
@@ -30,13 +32,12 @@ public class MazeSolverBFSTools {
             }
 
             if (maze.getStructureByPoint(next) == MazeStructureEnum.WALL) {
-                maze.setVisited(next, true);
+                maze.setVisited(next);
                 continue;
             }
 
             if (maze.getStructureByPoint(next) == MazeStructureEnum.OUT ) {
-                List<Point> listSuccess = getBacktrackPath(next);
-                mazeInfo.getSuccesfulPathList().add(listSuccess);
+                mazeInfo.getMazeInfoPaths().add(getBacktrackPath(next));
             }
 
             for (DirectionEnum direction : DirectionEnum.values()) {
@@ -57,16 +58,18 @@ public class MazeSolverBFSTools {
         return mazeInfo;
     }
 
-    private List<Point> getBacktrackPath(Point cur) {
+    private MazeInfoPath getBacktrackPath(Point cur) {
         List<Point> path = new ArrayList<>();
+        int counter = 0;
         Point iter = cur;
 
         while (iter != null) {
+            if (iter.getParent() != null && iter.getDirection() != iter.getParent().getDirection())
+                counter++;
             path.add(iter);
             iter = iter.getParent();
         }
-
-        return path;
+        return MazeInfoPath.builder().succesfulPathList(path).counterChangeDirection(counter-1).build();
     }
 
     private boolean getBacktrackToCheckIfBeenThere(Point cur, Point pointToCheck) {

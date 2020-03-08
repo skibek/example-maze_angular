@@ -1,8 +1,6 @@
 package org.example.maze.service;
 
-import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
-import org.example.maze.MazeApplication;
 import org.example.maze.domain.MazeInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-@SpringBootTest(classes = MazeApplication.class)
+@SpringBootTest
 public class RepoServiceTest {
 
     @Autowired
@@ -26,17 +24,17 @@ public class RepoServiceTest {
 
     @BeforeEach
     public void init() {
+        //given
         repoService.initFakerData(nrOfElements);
     }
 
     @Test
     public void assertThatPageMechanismWorks() {
-        //repoService.listMazeInfo.forEach(mazeInfo -> log.info(mazeInfo.toString()));
-
+        //given
         Pageable firstPageWithTwoElements = PageRequest.of(1, nrOfElementsOnPage);
+        //when
         Page<MazeInfo> page = repoService.getPageableMazeInfo(firstPageWithTwoElements);
-        page.getTotalElements();
-
+        //then
         assertThat(page.getTotalElements()).isEqualTo(nrOfElements);
         assertThat(page.getContent().size()).isEqualTo(nrOfElementsOnPage);
         assertThat((double)page.getTotalPages()).isEqualTo(Math.ceil((double) nrOfElements/(double)nrOfElementsOnPage));

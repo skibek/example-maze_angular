@@ -1,9 +1,9 @@
 package org.example.maze.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Arrays;
+import org.example.maze.domain.MazeInfo;
 
 @Data
 @Builder
@@ -38,15 +38,12 @@ public class Maze {
         return visited[point.getX()][point.getY()];
     }
 
-    public void setVisited(Point point, boolean value) {
-        visited[point.getX()][point.getY()] = value;
+    public void setVisited(Point point) {
+        visited[point.getX()][point.getY()] = true;
     }
 
     public boolean isValidLocation(Point point) {
-        if (point.getX() < 0 || point.getX() >= height || point.getY() < 0 || point.getY() >= width) {
-            return false;
-        }
-        return true;
+        return point.getX() >= 0 && point.getX() < height && point.getY() >= 0 && point.getY() < width;
     }
 
     public String displayGraphics() {
@@ -59,10 +56,5 @@ public class Maze {
             result.append(System.lineSeparator());
         }
         return result.toString();
-    }
-
-    public void reset() {
-        for (int i = 0; i < visited.length; i++)
-            Arrays.fill(visited[i], false);
     }
 }

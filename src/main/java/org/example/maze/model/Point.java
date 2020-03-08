@@ -11,8 +11,8 @@ public class Point implements Cloneable {
 
     private int x;
     private int y;
-    Point parent;
-    DirectionEnum direction;
+    private Point parent;
+    private DirectionEnum direction;
 
     public Point(int x, int y) {
         this.x = x;
