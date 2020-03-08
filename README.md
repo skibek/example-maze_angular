@@ -1,4 +1,4 @@
-#Description of APP
+# Description of APP
 Maze resolver with return info of smallest number of turns(direction changes) in maze that goes from start to end.
 
 Start - can be found on N/W wall
@@ -9,13 +9,16 @@ App search for all good path and count changes in directions.
 
 In REST there are almost all data from algorithm calc.
 
-We use DFC and BFS algorithm (all can be tested in JUnit Tests)
+We use DFS and BFS algorithm (all can be tested in JUnit Tests)
 
 On Resource endpoint (REST) there are only needed algorithm for the task.
 
 ```
 Algorithm based on (with changes to resolve task): 
+https://en.wikipedia.org/wiki/Breadth-first_search
+https://en.wikipedia.org/wiki/Depth-first_search
 https://www.baeldung.com/java-solve-maze
+https://github.com/jaalsh/java-maze-algorithms
 ```
 
 ```
